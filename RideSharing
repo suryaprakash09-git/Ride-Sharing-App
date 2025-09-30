@@ -1,0 +1,95 @@
+import java.util.Scanner;
+
+class InvalidRideTypeException extends Exception {
+    public InvalidRideTypeException(String text) {
+        super(text);
+    }
+}
+
+abstract class Ride {
+    private String driver;
+    private String vehicleNo;
+    protected double dist;  
+
+    public Ride(String dName, String vNo, double dist) {
+        this.driver = dName;
+        this.vehicleNo = vNo;
+        this.dist = dist;
+    }
+
+    public String getDriver() {
+        return driver;
+    }
+
+    public String getVehicleNo() {
+        return vehicleNo;
+    }
+
+    public double getDistance() {
+        return dist;
+    }
+
+    public abstract double calculateFare();
+}
+
+class BikeRide extends Ride {
+    public BikeRide(String dName, String vNo, double dist) {
+        super(dName, vNo, dist);
+    }
+
+    @Override
+    public double calculateFare() {
+        double rate = 10;  
+        return dist * rate;
+    }
+}
+
+class CarRide extends Ride {
+    public CarRide(String dName, String vNo, double kms) {
+        super(dName, vNo, kms);
+    }
+
+    @Override
+    public double calculateFare() {
+        return dist * 20;
+    }
+}
+
+public class RideSharingSystem {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            String rideChoice = scanner.nextLine().trim().toLowerCase();
+            double distance = scanner.nextDouble();
+
+            if (distance <= 0) {
+                throw new IllegalArgumentException("Distance must be greater than 0");
+            }
+
+            Ride bookedRide;
+
+            if (rideChoice.equals("bike")) {
+                bookedRide = new BikeRide("Driver1", "BIKE1234", distance);
+            } else if (rideChoice.equals("car")) {
+                bookedRide = new CarRide("Driver2", "CAR5678", distance);
+            } else {
+                throw new InvalidRideTypeException("Invalid ride type: " + rideChoice);
+            }
+
+            double fare = bookedRide.calculateFare();
+
+            System.out.println("Driver: " + bookedRide.getDriver());
+            System.out.println("Vehicle No: " + bookedRide.getVehicleNo());
+            System.out.println("Distance: " + bookedRide.getDistance() + " km");
+            System.out.println("Fare: ₹" + (int) fare);
+
+        } catch (InvalidRideTypeException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            scanner.close();
+        }
+    }
+}
